@@ -6,6 +6,7 @@ function Blogs() {
   const { blogs } = useAuth();
 
   console.log(blogs);
+  console.log("ITs me");
   return (
     <div>
       <div className="container mx-auto my-12 p-4">

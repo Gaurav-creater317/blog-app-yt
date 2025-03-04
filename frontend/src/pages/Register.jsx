@@ -132,10 +132,16 @@ function Register() {
               className="w-full p-2 mb-4 border rounded-md"
             >
               <option value="">Select Your Education</option>
+              <option value="BCA ">B.tech</option>
+              <option value="MCA ">M.tech</option>
               <option value="BCA ">BCA</option>
-              <option value="MCA ">MCA</option>
-              <option value="MBA ">MBA</option>
-              <option value="BBA ">BBA</option>
+              <option value="BCA ">MCA</option>
+              <option value="MBA ">BBA</option>
+              <option value="BBA ">MBA</option>
+              <option value="BCA ">Diploma</option>
+              <option value="BCA ">Schooling</option>
+              <option value="BCA ">Other</option>
+              
             </select>
             <div className="flex items-center mb-4">
               <div className="photo w-20 h-20 mr-4">

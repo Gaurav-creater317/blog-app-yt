@@ -36,7 +36,7 @@ function MyBlogs() {
   };
   return (
     <div>
-      <div className="container mx-auto my-12 p-4">
+      <div className="container mx-auto w-[80%] my-12 p-4 mr-20">
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:ml-20">
           {myBlogs && myBlogs.length > 0 ? (
             myBlogs.map((element) => (

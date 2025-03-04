@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 
 function Creator() {
   const [admin, setAdmin] = useState([]);
-  console.log(admin);
+  // console.log(admin);
   useEffect(() => {
     const fetchAdmins = async () => {
       const { data } = await axios.get(

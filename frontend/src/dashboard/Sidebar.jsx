@@ -28,7 +28,7 @@ function Sidebar({ setComponent }) {
         { withCredentials: true }
       );
       toast.success(data.message);
-       localStorage.removeItem("jwt"); // deleting token in localStorage so that if user logged out it will goes to login page
+      localStorage.removeItem("jwt"); // deleting token in localStorage so that if user logged out it will goes to login page
       setIsAuthenticated(false);
       navigateTo("/login");
     } catch (error) {
@@ -46,7 +46,7 @@ function Sidebar({ setComponent }) {
         <CiMenuBurger className="text-2xl" />
       </div>
       <div
-        className={`w-64 h-full shadow-lg fixed top-0 left-0 bg-gray-50 transition-transform duration-300 transform sm:translate-x-0 ${
+        className={`w-2/12 h-full shadow-lg fixed top-0 left-0 bg-gray-50 transition-transform duration-300 transform sm:translate-x-0 ${
           show ? "translate-x-0" : "-translate-x-full"
         }`}
       >
