@@ -210,7 +210,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
-const backendURL = "https://blog-app-yt-pl9n.onrender.com";
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 
 const AuthContext = createContext();
 
