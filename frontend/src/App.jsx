@@ -32,7 +32,7 @@ function App() {
         <Route
           exact
           path="/"
-          element={token ? <Home /> : <Navigate to={"/login"} />}
+          element={isAuthenticated ? <Home /> : <Navigate to={"/login"} />}
         />
         <Route exact path="/blogs" element={<Blogs />} />
         <Route exact path="/about" element={<About />} />
@@ -40,7 +40,7 @@ function App() {
         <Route exact path="/creators" element={<Creators />} />
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/register" element={<Register />} />
-        <Route exact path="/dashboard" element={<Dashboard />} />
+        <Route exact path="/dashboard" element={isAuthenticated ?<Dashboard /> : <Navigate to={"/login"} />}
 
         {/* Single page route */}
         <Route exact path="/blog/:id" element={<Detail />} />
