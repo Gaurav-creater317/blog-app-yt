@@ -9,7 +9,7 @@ const createTokenAndSaveCookies = async (userId, res) => {
     httpOnly: false, // Temporarily set to false for testing
     secure: true,
     sameSite: "none",
-    path: "/", // Ensure the cookie is available throughout the site
+    //path: "/", // Ensure the cookie is available throughout the site
   });
   await User.findByIdAndUpdate(userId, { token });
   return token;
