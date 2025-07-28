@@ -142,12 +142,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext();
 
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+
 export const AuthProvider = ({ children }) => {
   const [blogs, setBlogs] = useState([]);
   const [profile, setProfile] = useState({});
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -155,13 +155,13 @@ export const AuthProvider = ({ children }) => {
         let token = localStorage.getItem("jwt");
         console.log("Token:", token);
         if (token) {
-          const { data } = await axios.get(`${BACKEND_URL}/api/users/my-profile`, {
+          const { data } = await axios.get(`${backendURL}/api/users/my-profile`, {
             withCredentials: true,
             headers: {
               "Content-Type": "application/json",
             },
           });
-          if (data && data.user) {
+          if (data?.user) {
             console.log("Fetched Profile:", data.user);
             setProfile(data.user);
             setIsAuthenticated(true);
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchBlogs = async () => {
       try {
-        const { data } = await axios.get(`${BACKEND_URL}/api/blogs/all-blogs`, {
+        const { data } = await axios.get(`${backendURL}/api/blogs/all-blogs`, {
           withCredentials: true,
         });
         console.log("Fetched Blogs:", data);
@@ -186,7 +186,7 @@ export const AuthProvider = ({ children }) => {
 
     fetchBlogs();
     fetchProfile();
-  }, [BACKEND_URL]);
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -204,4 +204,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-
