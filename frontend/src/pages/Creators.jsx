@@ -8,7 +8,7 @@ function Creators() {
     const fetchCreators = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:4001/api/users/admins",
+          "https://blog-app-yt-pl9n.onrender.com/api/users/admins",
           {
             withCredentials: true,
           }
