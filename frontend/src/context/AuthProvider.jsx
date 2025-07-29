@@ -319,7 +319,7 @@
 // export const useAuth = () => useContext(AuthContext);
 
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -327,67 +327,45 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [blogs, setBlogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const backendURL = "https://blog-app-yt-pl9n.onrender.com"; // replace if needed
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
 
-  useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (token) {
-      setIsAuthenticated(true);
-      fetchProfile(token);
-    }
-  }, []);
-
-  const login = (userData, token) => {
-    setUser(userData);
-    localStorage.setItem("jwt", token);
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("jwt");
-    setIsAuthenticated(false);
-    toast.success("Logged out successfully");
-  };
-
-  const fetchProfile = async (token) => {
+  const fetchUser = async () => {
     try {
-      const res = await axios.get(`${backendURL}/api/users/my-profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.get(`${backendURL}/api/users/profile`, {
         withCredentials: true,
       });
-      setUser(res.data.user);
-    } catch (err) {
-      console.error("Failed to fetch user", err);
+      setUser(res.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setUser(null);
+      setIsAuthenticated(false);
     }
   };
 
-  const fetchBlogs = async () => {
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const logout = async () => {
     try {
-      const res = await axios.get(`${backendURL}/api/blogs/all-blogs`);
-      setBlogs(res.data.blogs || []);
-    } catch (err) {
-      console.error("Failed to fetch blogs", err);
+      await axios.get(`${backendURL}/api/users/logout`, {
+        withCredentials: true,
+      });
+
+      setUser(null);
+      localStorage.removeItem("jwt");
+      setIsAuthenticated(false);
+      toast.success("User logged out successfully");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      throw error; // So that Navbar can catch and handle it
     }
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        blogs,
-        setBlogs,
-        fetchBlogs,
-        login,
-        logout,
-        isAuthenticated,
-      }}
-    >
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated, logout }}>
       {children}
     </AuthContext.Provider>
   );
