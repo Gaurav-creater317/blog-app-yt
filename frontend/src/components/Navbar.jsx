@@ -255,45 +255,66 @@
 
 // blog-app-yt/frontend/src/components/Navbar.jsx
 
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { AiOutlineMenu } from "react-icons/ai";
+import { IoCloseSharp } from "react-icons/io5";
 import { useAuth } from "../context/AuthProvider";
-import toast from "react-hot-toast";
 
 function Navbar() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const [show, setShow] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    try {
-      await logout();
-      navigate("/login");
-    } catch (error) {
-      toast.error("Failed to logout");
-    }
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   return (
-    <nav className="navbar">
-      <h2>CilliBlog</h2>
-      <ul>
-        <li><Link to="/">HOME</Link></li>
-        <li><Link to="/blogs">BLOGS</Link></li>
-        <li><Link to="/creators">CREATORS</Link></li>
-        <li><Link to="/about">ABOUT</Link></li>
-        <li><Link to="/contact">CONTACT</Link></li>
-
-        {isAuthenticated && user?.role === "admin" && (
-          <li><Link to="/dashboard">DASHBOARD</Link></li>
-        )}
-
-        {isAuthenticated && (
-          <li>
-            <button onClick={handleLogout} className="logout-btn">LOGOUT</button>
-          </li>
-        )}
-      </ul>
+    <nav className="shadow-lg p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="text-xl font-semibold">Cilli<span className="text-blue-500">Blog</span></div>
+        <div className="space-x-4 hidden md:flex">
+          <Link to="/">HOME</Link>
+          <Link to="/blogs">BLOGS</Link>
+          <Link to="/creators">CREATORS</Link>
+          <Link to="/about">ABOUT</Link>
+          <Link to="/contact">CONTACT</Link>
+        </div>
+        <div className="hidden md:flex space-x-2">
+          {isAuthenticated && user?.role === "admin" && (
+            <Link to="/dashboard" className="btn-blue">DASHBOARD</Link>
+          )}
+          {!isAuthenticated ? (
+            <Link to="/login" className="btn-red">LOGIN</Link>
+          ) : (
+            <button onClick={handleLogout} className="btn-red">LOGOUT</button>
+          )}
+        </div>
+        <div className="md:hidden" onClick={() => setShow(!show)}>
+          {show ? <IoCloseSharp size={24} /> : <AiOutlineMenu size={24} />}
+        </div>
+      </div>
+      {show && (
+        <div className="md:hidden">
+          <ul className="flex flex-col space-y-4 p-4">
+            <Link to="/" onClick={() => setShow(false)}>HOME</Link>
+            <Link to="/blogs" onClick={() => setShow(false)}>BLOGS</Link>
+            <Link to="/creators" onClick={() => setShow(false)}>CREATORS</Link>
+            <Link to="/about" onClick={() => setShow(false)}>ABOUT</Link>
+            <Link to="/contact" onClick={() => setShow(false)}>CONTACT</Link>
+            {isAuthenticated && user?.role === "admin" && (
+              <Link to="/dashboard" onClick={() => setShow(false)}>DASHBOARD</Link>
+            )}
+            {isAuthenticated ? (
+              <button onClick={() => { handleLogout(); setShow(false); }}>LOGOUT</button>
+            ) : (
+              <Link to="/login" onClick={() => setShow(false)}>LOGIN</Link>
+            )}
+          </ul>
+        </div>
+      )}
     </nav>
   );
 }
