@@ -266,79 +266,50 @@
 
 // export const useAuth = () => useContext(AuthContext);
 
+// frontend/context/AuthProvider.jsx
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
-const backendURL = import.meta.env.VITE_BACKEND_URL;
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true); // To prevent flickering on page load
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const isAuthenticated = !!user;
-
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem("jwt");
-      if (!token) {
-        setUser(null);
-        return;
-      }
-
-      const { data } = await axios.get(`${backendURL}/api/users/my-profile`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true, // important for cookies
-      });
-
-      setUser(data?.user || null);
-    } catch (error) {
-      console.error("Error fetching profile:", error.message);
-      setUser(null);
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      setIsAuthenticated(true);
+      // Optionally fetch user or blogs
     }
+  }, []);
+
+  const login = (userData, token) => {
+    setUser(userData);
+    localStorage.setItem("jwt", token);
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("jwt");
+    setIsAuthenticated(false);
   };
 
   const fetchBlogs = async () => {
     try {
-      const token = localStorage.getItem("jwt");
-      if (!token) return;
-
-      const { data } = await axios.get(`${backendURL}/api/blogs/all-blogs`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      });
-
-      setBlogs(data?.blogs || []);
-    } catch (error) {
-      console.error("Error fetching blogs:", error.message);
+      const res = await axios.get("https://blog-app-api-xyz.onrender.com/api/blogs"); // Replace with your backend
+      setBlogs(res.data);
+    } catch (err) {
+      console.error("Failed to fetch blogs", err);
     }
   };
 
-  useEffect(() => {
-    const initialize = async () => {
-      await fetchProfile();
-      await fetchBlogs();
-      setLoading(false);
-    };
-    initialize();
-  }, []);
-
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        blogs,
-        isAuthenticated,
-        fetchBlogs,
-        fetchProfile,
-        loading,
-      }}
+      value={{ user, blogs, setBlogs, fetchBlogs, login, logout, isAuthenticated }}
     >
       {children}
     </AuthContext.Provider>
