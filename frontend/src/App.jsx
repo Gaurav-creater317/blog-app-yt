@@ -56,6 +56,10 @@
 //     </div>
 
 // frontend/App.jsx
+
+
+// frontend/App.jsx
+
 import React from "react";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
@@ -76,11 +80,11 @@ import Detail from "./pages/Detail";
 
 function App() {
   const location = useLocation();
-  const hideNavbarFooter = ["/dashboard", "/login", "/register"].includes(location.pathname);
+  const hideNavbarFooter = ["/dashboard", "/login", "/register"].includes(
+    location.pathname
+  );
 
-  const { blogs, isAuthenticated, loading } = useAuth();
-
-  if (loading) return <p>Loading...</p>; // Optional: add a loading spinner
+  const { isAuthenticated } = useAuth();
 
   return (
     <div>
@@ -91,33 +95,24 @@ function App() {
           path="/"
           element={isAuthenticated ? <Home /> : <Navigate to="/login" />}
         />
+        <Route
+          exact
+          path="/dashboard"
+          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+        />
         <Route exact path="/blogs" element={<Blogs />} />
         <Route exact path="/about" element={<About />} />
         <Route exact path="/contact" element={<Contact />} />
         <Route exact path="/creators" element={<Creators />} />
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/register" element={<Register />} />
-        <Route
-          exact
-          path="/dashboard"
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-        />
         <Route exact path="/blog/:id" element={<Detail />} />
-        <Route
-          exact
-          path="/blog/update/:id"
-          element={isAuthenticated ? <UpdateBlog /> : <Navigate to="/login" />}
-        />
+        <Route exact path="/blog/update/:id" element={<UpdateBlog />} />
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
       <Toaster />
       {!hideNavbarFooter && <Footer />}
     </div>
-  );
-}
-
-export default App;
-
   );
 }
 
