@@ -268,8 +268,60 @@
 
 // frontend/context/AuthProvider.jsx
 
+// import React, { createContext, useContext, useEffect, useState } from "react";
+// import axios from "axios";
+
+// const AuthContext = createContext();
+
+// export const AuthProvider = ({ children }) => {
+//   const [user, setUser] = useState(null);
+//   const [blogs, setBlogs] = useState([]);
+//   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+//   useEffect(() => {
+//     const token = localStorage.getItem("jwt");
+//     if (token) {
+//       setIsAuthenticated(true);
+//       // Optionally fetch user or blogs
+//     }
+//   }, []);
+
+//   const login = (userData, token) => {
+//     setUser(userData);
+//     localStorage.setItem("jwt", token);
+//     setIsAuthenticated(true);
+//   };
+
+//   const logout = () => {
+//     setUser(null);
+//     localStorage.removeItem("jwt");
+//     setIsAuthenticated(false);
+//   };
+
+//   const fetchBlogs = async () => {
+//     try {
+//       const res = await axios.get("https://blog-app-api-xyz.onrender.com/api/blogs"); // Replace with your backend
+//       setBlogs(res.data);
+//     } catch (err) {
+//       console.error("Failed to fetch blogs", err);
+//     }
+//   };
+
+//   return (
+//     <AuthContext.Provider
+//       value={{ user, blogs, setBlogs, fetchBlogs, login, logout, isAuthenticated }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// export const useAuth = () => useContext(AuthContext);
+
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -278,11 +330,13 @@ export const AuthProvider = ({ children }) => {
   const [blogs, setBlogs] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const backendURL = "https://blog-app-yt-pl9n.onrender.com"; // replace if needed
+
   useEffect(() => {
     const token = localStorage.getItem("jwt");
     if (token) {
       setIsAuthenticated(true);
-      // Optionally fetch user or blogs
+      fetchProfile(token);
     }
   }, []);
 
@@ -296,12 +350,27 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("jwt");
     setIsAuthenticated(false);
+    toast.success("Logged out successfully");
+  };
+
+  const fetchProfile = async (token) => {
+    try {
+      const res = await axios.get(`${backendURL}/api/users/my-profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      });
+      setUser(res.data.user);
+    } catch (err) {
+      console.error("Failed to fetch user", err);
+    }
   };
 
   const fetchBlogs = async () => {
     try {
-      const res = await axios.get("https://blog-app-api-xyz.onrender.com/api/blogs"); // Replace with your backend
-      setBlogs(res.data);
+      const res = await axios.get(`${backendURL}/api/blogs/all-blogs`);
+      setBlogs(res.data.blogs || []);
     } catch (err) {
       console.error("Failed to fetch blogs", err);
     }
@@ -309,7 +378,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, blogs, setBlogs, fetchBlogs, login, logout, isAuthenticated }}
+      value={{
+        user,
+        blogs,
+        setBlogs,
+        fetchBlogs,
+        login,
+        logout,
+        isAuthenticated,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -317,3 +394,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
