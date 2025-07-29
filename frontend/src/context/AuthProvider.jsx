@@ -319,9 +319,8 @@
 // export const useAuth = () => useContext(AuthContext);
 
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -329,43 +328,47 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const backendURL = import.meta.env.VITE_BACKEND_URL;
-
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(`${backendURL}/api/users/profile`, {
-        withCredentials: true,
-      });
-      setUser(res.data);
-      setIsAuthenticated(true);
-    } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  };
+  const backendURL = "https://blog-app-yt-pl9n.onrender.com";
 
   useEffect(() => {
-    fetchUser();
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      // If token exists, fetch user profile
+      axios.get(`${backendURL}/api/users/my-profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      })
+      .then(res => {
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+      })
+      .catch(err => {
+        console.error("Profile fetch error:", err);
+        localStorage.removeItem("jwt");
+        setIsAuthenticated(false);
+      });
+    }
   }, []);
+
+  const login = (userData, token) => {
+    setUser(userData);
+    localStorage.setItem("jwt", token);
+    setIsAuthenticated(true);
+  };
 
   const logout = async () => {
     try {
-      await axios.get(`${backendURL}/api/users/logout`, {
-        withCredentials: true,
-      });
-
-      setUser(null);
-      localStorage.removeItem("jwt");
-      setIsAuthenticated(false);
-      toast.success("User logged out successfully");
+      await axios.get(`${backendURL}/api/users/logout`, { withCredentials: true });
     } catch (error) {
-      console.error("Logout failed:", error);
-      throw error; // So that Navbar can catch and handle it
+      console.error("Logout server error:", error);
     }
+    setUser(null);
+    localStorage.removeItem("jwt");
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
