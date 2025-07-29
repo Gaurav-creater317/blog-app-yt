@@ -116,7 +116,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 
 function Login() {
-  const { login } = useAuth(); // ✅ Use the login method from context
+  const { login } = useAuth(); // ✅ Context method
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -125,6 +125,11 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!role) {
+      toast.error("Please select a role");
+      return;
+    }
 
     try {
       const { data } = await axios.post(
@@ -138,20 +143,22 @@ function Login() {
         }
       );
 
-      // ✅ Call login() from context instead of manually updating state
-      login(data.user, data.token);
+      login(data.user, data.token); // ✅ Update context
 
       toast.success(data.message || "Logged in successfully");
       setEmail("");
       setPassword("");
       setRole("");
-      navigate("/dashboard");
+
+      // ✅ Redirect based on role
+      if (data.user?.role === "admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Login Error:", error);
-      toast.error(
-        error?.response?.data?.message || "Login failed. Try again.",
-        { duration: 3000 }
-      );
+      toast.error(error?.response?.data?.message || "Login failed. Try again.");
     }
   };
 
@@ -212,5 +219,3 @@ function Login() {
 }
 
 export default Login;
-
-
