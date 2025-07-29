@@ -60,6 +60,8 @@
 
 // frontend/App.jsx
 
+// frontend/App.jsx
+
 import React from "react";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
@@ -84,30 +86,56 @@ function App() {
     location.pathname
   );
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <div>
       {!hideNavbarFooter && <Navbar />}
       <Routes>
+        {/* Public routes */}
         <Route
           exact
           path="/"
           element={isAuthenticated ? <Home /> : <Navigate to="/login" />}
         />
-        <Route
-          exact
-          path="/dashboard"
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-        />
         <Route exact path="/blogs" element={<Blogs />} />
         <Route exact path="/about" element={<About />} />
         <Route exact path="/contact" element={<Contact />} />
         <Route exact path="/creators" element={<Creators />} />
+
+        {/* Auth routes */}
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/register" element={<Register />} />
-        <Route exact path="/blog/:id" element={<Detail />} />
-        <Route exact path="/blog/update/:id" element={<UpdateBlog />} />
+
+        {/* Protected routes */}
+        <Route
+          exact
+          path="/dashboard"
+          element={
+            isAuthenticated && user?.role === "admin" ? (
+              <Dashboard />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
+        <Route
+          exact
+          path="/blog/:id"
+          element={isAuthenticated ? <Detail /> : <Navigate to="/login" />}
+        />
+        <Route
+          exact
+          path="/blog/update/:id"
+          element={isAuthenticated && user?.role === "admin" ? (
+            <UpdateBlog />
+          ) : (
+            <Navigate to="/login" />
+          )}
+        />
+
+        {/* 404 fallback route (optional) */}
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
       <Toaster />
